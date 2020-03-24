@@ -18,20 +18,26 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"sync"
 
 	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
 	"github.com/techniumlabs/cinit/pkg/proc"
-	"github.com/techniumlabs/cinit/pkg/secrets"
+	// "github.com/techniumlabs/cinit/pkg/secrets"
+	"github.com/techniumlabs/cinit/pkg/templates"
 )
 
 var cfgFile string
+
+type FileTemplate struct {
+	Source string
+	Dest   string
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -43,15 +49,26 @@ var rootCmd = &cobra.Command{
 3. Fetch Secrets and expose it as Environment Variables`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			log.Println("No Main Command Provided")
-			os.Exit(1)
+			log.Fatal("No Main Command Provided")
 		}
 		// Get and expose any secrets
 		client := secrets.NewSecretsClient()
 		envs := client.GetParsedEnvs()
 
 		// Replace Template Files
+		tclient, _ := templates.NewTemplateClient("default")
+		var config CinitConfig
+		err := viper.Unmarshal(&config)
+		if err != nil {
+			log.Fatalf("Invalid Config File Format: %s", err.Error())
+		}
 
+		for _, elem := range config.Templates {
+			err = tclient.Provider.ResolveTemplates(elem.Source, elem.Dest, envs)
+			if err != nil {
+				log.Error("Template could not be Resolved")
+			}
+		}
 		// Execute any pre commands and post commands on exit
 
 		// Execute the provided command
@@ -67,7 +84,7 @@ var rootCmd = &cobra.Command{
 		if len(args) > 1 {
 			argsSlice = args[1:]
 		}
-		err := proc.Run(command, argsSlice, envs)
+		err = proc.Run(command, argsSlice, envs)
 		if err != nil {
 			log.Println("Main command failed with error", err.Error())
 			mainRC = 1
@@ -83,8 +100,7 @@ var rootCmd = &cobra.Command{
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatalf("Failed to execute: %s", err.Error())
 	}
 }
 
@@ -124,8 +140,8 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		log.Infof("Using config file:", viper.ConfigFileUsed())
 	} else {
-		fmt.Printf("%s", err.Error())
+		log.Warnf("%s", err.Error())
 	}
 }
