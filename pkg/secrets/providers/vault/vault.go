@@ -1,17 +1,25 @@
 package vault
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"strings"
 
+	"fmt"
+
 	vaultapi "github.com/hashicorp/vault/api"
 	log "github.com/sirupsen/logrus"
+	"k8s.io/client-go/rest"
 )
 
 type VaultSecretProvider struct {
 	Client *vaultapi.Client
 }
+
+const (
+	serviceAccountFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+)
 
 func NewVaultSecretProvider() (*VaultSecretProvider, error) {
 
@@ -53,10 +61,40 @@ func NewVaultSecretProvider() (*VaultSecretProvider, error) {
 		}
 	}
 
+	// Check if the binary is running inside kuberentes container
+	_, err = rest.InClusterConfig()
+	if err != nil {
+		return nil, err
+	} else {
 
-	return &VaultSecretProvider{
-		Client: client,
-	}, nil
+		jwt, err := ioutil.ReadFile(serviceAccountFile)
+		if err != nil {
+			return nil, err
+		}
+
+		vaultRole := os.Getenv("VAULT_LOGIN_ROLE")
+		authPath := os.Getenv("KUBERNETES_AUTH_PATH")
+
+		data := map[string]interface{}{"jwt": string(jwt), "role": vaultRole}
+
+		secret, err := client.Logical().Write(fmt.Sprintf("auth/%s/login", authPath), data)
+		if err != nil {
+			log.Error("Failed to request new Vault token", err.Error())
+			return nil, err
+		}
+
+		if secret == nil {
+			log.Error("received empty answer from Vault")
+			return nil, errors.New("Empty answer from vault")
+		}
+
+		client.SetToken(secret.Auth.ClientToken)
+		return &VaultSecretProvider{
+			Client: client,
+		}, nil
+	}
+
+	return nil, errors.New("No auth possible")
 }
 
 func (v *VaultSecretProvider) ResolveSecrets(vars map[string]string) map[string]string {

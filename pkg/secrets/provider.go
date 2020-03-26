@@ -31,6 +31,9 @@ func NewSecretsClient() *SecretsClient {
 func (c *SecretsClient) InitProviders() error {
 	providerNames := viper.GetStringSlice("providers")
 	var providers []SecretsProvider
+	if len(providerNames) == 0 {
+		providerNames = []string{"vault",}
+	}
 	for _, providerName := range providerNames {
 		if providerName == "vault" {
 			provider, err := vault.NewVaultSecretProvider()
