@@ -28,7 +28,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/techniumlabs/cinit/pkg/proc"
-	// "github.com/techniumlabs/cinit/pkg/secrets"
+	"github.com/techniumlabs/cinit/pkg/secrets"
 	"github.com/techniumlabs/cinit/pkg/templates"
 )
 

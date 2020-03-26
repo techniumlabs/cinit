@@ -1,11 +1,12 @@
 package vault
 
 import (
-	"log"
+	"io/ioutil"
 	"os"
 	"strings"
 
 	vaultapi "github.com/hashicorp/vault/api"
+	log "github.com/sirupsen/logrus"
 )
 
 type VaultSecretProvider struct {
@@ -31,8 +32,27 @@ func NewVaultSecretProvider() (*VaultSecretProvider, error) {
 	}
 
 	if envVaultToken != "" {
+		log.Info("Using VAULT_TOKEN")
 		client.SetToken(envVaultToken)
+		return &VaultSecretProvider{
+			Client: client,
+		}, nil
 	}
+
+	homedir := os.Getenv("HOME")
+	if _, err := os.Stat(homedir + "/.vault-token"); err == nil {
+		tokendata, err := ioutil.ReadFile(homedir + "/.vault-token")
+		if err != nil {
+			log.Warnf("Could not read vault token from ~/.vault-token. %s", err.Error())
+		} else {
+			log.Info("Using ~/.vault-token")
+			client.SetToken(string(tokendata))
+			return &VaultSecretProvider{
+				Client: client,
+			}, nil
+		}
+	}
+
 
 	return &VaultSecretProvider{
 		Client: client,
