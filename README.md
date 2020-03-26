@@ -29,7 +29,8 @@ you can use it as an entrypoint and command
 ### Locally
     `cinit run -- command_to_run`
 
-## Parameters
+## Configuration
+cinit looks for configuration file `.cinit.yaml` in the current directory or home directory in that order.
 
 ## Acknowledgement
 The code for init is taken from [go-init](https://github.com/pablo-ruth/go-init).
