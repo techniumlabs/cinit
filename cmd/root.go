@@ -16,28 +16,15 @@ limitations under the License.
 package cmd
 
 import (
-	"context"
-	"fmt"
-	"os"
-	"sync"
-
 	"github.com/spf13/cobra"
 
-	homedir "github.com/mitchellh/go-homedir"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 
-	"github.com/techniumlabs/cinit/pkg/proc"
-	"github.com/techniumlabs/cinit/pkg/secrets"
-	"github.com/techniumlabs/cinit/pkg/templates"
+	initApp "github.com/techniumlabs/cinit/pkg/app"
 )
 
 var cfgFile string
-
-type FileTemplate struct {
-	Source string
-	Dest   string
-}
+var app *initApp.App
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -47,52 +34,13 @@ var rootCmd = &cobra.Command{
 1. Proper Signal Forwarding
 2. Orphaned Zombies Reaping
 3. Fetch Secrets and expose it as Environment Variables`,
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		var err error
+		app, err = initApp.NewApp(cfgFile)
+		return err
+	},
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			log.Fatal("No Main Command Provided")
-		}
-		// Get and expose any secrets
-		client := secrets.NewSecretsClient()
-		envs := client.GetParsedEnvs()
-
-		// Replace Template Files
-		tclient, _ := templates.NewTemplateClient("default")
-		var config CinitConfig
-		err := viper.Unmarshal(&config)
-		if err != nil {
-			log.Fatalf("Invalid Config File Format: %s", err.Error())
-		}
-
-		for _, elem := range config.Templates {
-			err = tclient.Provider.ResolveTemplates(elem.Source, elem.Dest, envs)
-			if err != nil {
-				log.Error("Template could not be Resolved")
-			}
-		}
-		// Execute any pre commands and post commands on exit
-
-		// Execute the provided command
-		// Routine to reap zombies (it's the job of init)
-		ctx, cancel := context.WithCancel(context.Background())
-		var wg sync.WaitGroup
-		wg.Add(1)
-		go proc.RemoveZombies(ctx, &wg)
-
-		var mainRC int
-		var argsSlice []string
-		command := args[0]
-		if len(args) > 1 {
-			argsSlice = args[1:]
-		}
-		err = proc.Run(command, argsSlice, envs)
-		if err != nil {
-			log.Println("Main command failed with error", err.Error())
-			mainRC = 1
-		} else {
-			log.Printf("Main command exited")
-		}
-
-		proc.CleanQuit(cancel, &wg, mainRC)
+		app.RunInit(args)
 	},
 }
 
@@ -105,8 +53,6 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
@@ -116,32 +62,4 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		viper.AddConfigPath(".")
-		viper.AddConfigPath(home + "/")
-		viper.SetConfigName(".cinit")
-	}
-
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		log.Infof("Using config file: %s", viper.ConfigFileUsed())
-	} else {
-		log.Warnf("%s", err.Error())
-	}
 }
