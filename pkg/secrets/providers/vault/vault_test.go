@@ -6,6 +6,9 @@ import (
 
 	"io/ioutil"
 
+	"gotest.tools/fs"
+
+	vaultapi "github.com/hashicorp/vault/api"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -64,4 +67,33 @@ func TestNewVaultProviderWithTokenAsPriority(t *testing.T) {
 	assert.NotNil(t, provider, "Should not be nil")
 	assert.Nil(t, err, "Should be nil")
 	assert.Equal(t, token, provider.Client.Token(), "Token should be equal")
+}
+
+func TestVaultKubernetesAuthWithoutServiceAccountFile(t *testing.T) {
+	client := &vaultapi.Client{}
+	err := VaultKubernetesAuth(client)
+	assert.Error(t, err, "Should throw error on non existent serviceAccountFile")
+}
+
+func TestVaultKubernetesAuthWithoutRole(t *testing.T) {
+	client := &vaultapi.Client{}
+	dir := fs.NewDir(t, "serviceAccountFile", fs.WithFile("token", `some-token`))
+	defer dir.Remove()
+
+	serviceAccountFile = dir.Path() + "/token"
+	ioutil.WriteFile(serviceAccountFile, []byte("some-token"), 0644)
+	err := VaultKubernetesAuth(client)
+	assert.EqualError(t, err, "VAULT_LOGIN_ROLE is null", "Should throw error on non existent Login Role")
+}
+
+func TestVaultKubernetesAuthWithoutPath(t *testing.T) {
+	client := &vaultapi.Client{}
+	dir := fs.NewDir(t, "serviceAccountFile", fs.WithFile("token", `some-token`))
+	defer dir.Remove()
+
+	serviceAccountFile = dir.Path() + "/token"
+	ioutil.WriteFile(serviceAccountFile, []byte("some-token"), 0644)
+	os.Setenv("VAULT_LOGIN_ROLE", "some-role")
+	err := VaultKubernetesAuth(client)
+	assert.EqualError(t, err, "KUBERNETES_AUTH_PATH is null", "Should throw error on non existent Login Role")
 }

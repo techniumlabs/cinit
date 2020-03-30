@@ -17,7 +17,7 @@ type VaultSecretProvider struct {
 	Client *vaultapi.Client
 }
 
-const (
+var (
 	serviceAccountFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 )
 
