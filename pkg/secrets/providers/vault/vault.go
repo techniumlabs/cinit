@@ -31,6 +31,8 @@ func NewVaultSecretProvider() (*VaultSecretProvider, error) {
 
 	if envVaultAddr != "" {
 		config.Address = envVaultAddr
+	} else {
+		return nil, errors.New("VAULT_ADDR is null")
 	}
 
 	client, err := vaultapi.NewClient(config)
@@ -66,29 +68,10 @@ func NewVaultSecretProvider() (*VaultSecretProvider, error) {
 	if err != nil {
 		return nil, err
 	} else {
-
-		jwt, err := ioutil.ReadFile(serviceAccountFile)
+		err = VaultKubernetesAuth(client)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Failed to authenticate with K8s token %v", err)
 		}
-
-		vaultRole := os.Getenv("VAULT_LOGIN_ROLE")
-		authPath := os.Getenv("KUBERNETES_AUTH_PATH")
-
-		data := map[string]interface{}{"jwt": string(jwt), "role": vaultRole}
-
-		secret, err := client.Logical().Write(fmt.Sprintf("auth/%s/login", authPath), data)
-		if err != nil {
-			log.Error("Failed to request new Vault token", err.Error())
-			return nil, err
-		}
-
-		if secret == nil {
-			log.Error("received empty answer from Vault")
-			return nil, errors.New("Empty answer from vault")
-		}
-
-		client.SetToken(secret.Auth.ClientToken)
 		return &VaultSecretProvider{
 			Client: client,
 		}, nil
@@ -113,10 +96,43 @@ func (v *VaultSecretProvider) ResolveSecrets(vars map[string]string) map[string]
 			}
 
 			data := secret.Data["data"].(map[string]interface{})
-			parsedString[vaultKey] = data[vaultKey].(string)
+			parsedString[key] = data[vaultKey].(string)
 		} else {
 			parsedString[key] = value
 		}
 	}
+	parsedString["VAULT_TOKEN"] = v.Client.Token()
 	return parsedString
+}
+
+func VaultKubernetesAuth(client *vaultapi.Client) error {
+	jwt, err := ioutil.ReadFile(serviceAccountFile)
+	if err != nil {
+		return err
+	}
+
+	vaultRole := os.Getenv("VAULT_LOGIN_ROLE")
+	if vaultRole == "" {
+		return errors.New("VAULT_LOGIN_ROLE is null")
+	}
+	authPath := os.Getenv("KUBERNETES_AUTH_PATH")
+	if authPath == "" {
+		return errors.New("KUBERNETES_AUTH_PATH is null")
+	}
+
+	data := map[string]interface{}{"jwt": string(jwt), "role": vaultRole}
+
+	secret, err := client.Logical().Write(fmt.Sprintf("auth/%s/login", authPath), data)
+	if err != nil {
+		log.Error("Failed to request new Vault token", err.Error())
+		return err
+	}
+
+	if secret == nil {
+		log.Error("received empty answer from Vault")
+		return errors.New("Empty answer from vault")
+	}
+
+	client.SetToken(secret.Auth.ClientToken)
+	return nil
 }

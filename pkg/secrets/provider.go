@@ -1,10 +1,10 @@
 package secrets
 
 import (
-	"log"
 	"os"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/techniumlabs/cinit/pkg/config"
 	"github.com/techniumlabs/cinit/pkg/secrets/providers/vault"
 )
