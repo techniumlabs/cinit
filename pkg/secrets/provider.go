@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/spf13/viper"
+	"github.com/techniumlabs/cinit/pkg/config"
 	"github.com/techniumlabs/cinit/pkg/secrets/providers/vault"
 )
 
@@ -18,9 +18,9 @@ type SecretsClient struct {
 	Providers []SecretsProvider
 }
 
-func NewSecretsClient() *SecretsClient {
+func NewSecretsClient(config *config.Config) *SecretsClient {
 	client := &SecretsClient{}
-	err := client.InitProviders()
+	err := client.InitProviders(config.SecretProviders)
 	if err != nil {
 		log.Printf("Could not Initialize Providers %v", err)
 	}
@@ -28,11 +28,10 @@ func NewSecretsClient() *SecretsClient {
 	return client
 }
 
-func (c *SecretsClient) InitProviders() error {
-	providerNames := viper.GetStringSlice("providers")
+func (c *SecretsClient) InitProviders(providerNames []string) error {
 	var providers []SecretsProvider
 	if len(providerNames) == 0 {
-		providerNames = []string{"vault",}
+		providerNames = []string{"vault"}
 	}
 	for _, providerName := range providerNames {
 		if providerName == "vault" {

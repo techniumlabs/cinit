@@ -36,7 +36,7 @@ func (a *App) RunInit(args []string) {
 		log.Fatal("No Main Command Provided")
 	}
 	// Get and expose any secrets
-	client := secrets.NewSecretsClient()
+	client := secrets.NewSecretsClient(a.Config)
 	envs := client.GetParsedEnvs()
 
 	// Replace Template Files
