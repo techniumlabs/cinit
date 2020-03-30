@@ -1,4 +1,4 @@
-# cinit ![cinit](https://github.com/techniumlabs/cinit/workflows/Go/badge.svg)
+# cinit ![cinit](https://github.com/techniumlabs/cinit/workflows/Go/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/techniumlabs/cinit/badge.svg?branch=master)](https://coveralls.io/github/techniumlabs/cinit?branch=master)
 cinit is a minimal init system for containers. It is designed to run as PID 1 inside containers. It is integrated with vault
 
 ## Why you need an init system
