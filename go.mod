@@ -12,7 +12,7 @@ require (
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/onsi/ginkgo v1.12.0
-	github.com/onsi/gomega v1.7.1
+	github.com/onsi/gomega v1.9.0
 	github.com/pierrec/lz4 v2.3.0+incompatible // indirect
 	github.com/rakyll/gotest v0.0.0-20200206190159-3023d5d6366c // indirect
 	github.com/sirupsen/logrus v1.4.2
