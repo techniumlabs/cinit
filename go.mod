@@ -15,7 +15,7 @@ require (
 	github.com/onsi/gomega v1.9.0
 	github.com/pierrec/lz4 v2.3.0+incompatible // indirect
 	github.com/rakyll/gotest v0.0.0-20200206190159-3023d5d6366c // indirect
-	github.com/sirupsen/logrus v1.4.2
+	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/cobra v0.0.6
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.5.1
