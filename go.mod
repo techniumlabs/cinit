@@ -16,7 +16,7 @@ require (
 	github.com/pierrec/lz4 v2.3.0+incompatible // indirect
 	github.com/rakyll/gotest v0.0.0-20200206190159-3023d5d6366c // indirect
 	github.com/sirupsen/logrus v1.5.0
-	github.com/spf13/cobra v0.0.6
+	github.com/spf13/cobra v0.0.7
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.5.1
 	golang.org/x/net v0.0.0-20191112182307-2180aed22343 // indirect
