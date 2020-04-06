@@ -68,3 +68,12 @@ templates:
 	assert.Equal(t, c.Templates[0].Dest, "/tmp/dest1", "Template dest should be equal")
 	assert.Equal(t, c.Templates[1].Dest, "/tmp/dest2", "Template dest should be equal")
 }
+
+func TestNoConfigFile(t *testing.T) {
+	dir := fs.NewDir(t, "test-config-file")
+	defer dir.Remove()
+	os.Chdir(dir.Path())
+	c, err := Load("")
+	assert.Nil(t, c, "Config should be nil")
+	assert.Error(t, err, "Should Throw an error")
+}

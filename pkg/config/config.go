@@ -43,11 +43,12 @@ func Load(cfgFile string) (*Config, error) {
 	// If a config file is found, read it in.
 	if err = v.ReadInConfig(); err == nil {
 		log.Infof("Using config file: %s", v.ConfigFileUsed())
+		c := &Config{}
+		err = v.Unmarshal(c)
+		return c, err
 	} else {
 		log.Warnf("%s", err.Error())
+		return nil, err
 	}
 
-	c := &Config{}
-	err = v.Unmarshal(c)
-	return c, err
 }
