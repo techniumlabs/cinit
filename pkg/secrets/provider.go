@@ -4,6 +4,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/techniumlabs/cinit/pkg/config"
 	"github.com/techniumlabs/cinit/pkg/secrets/providers/vault"
@@ -23,6 +24,7 @@ func NewSecretsClient(config *config.Config) *SecretsClient {
 	err := client.InitProviders(config.SecretProviders)
 	if err != nil {
 		log.Printf("Could not Initialize Providers %v", err)
+		return nil
 	}
 
 	return client
@@ -30,6 +32,7 @@ func NewSecretsClient(config *config.Config) *SecretsClient {
 
 func (c *SecretsClient) InitProviders(providerNames []string) error {
 	var providers []SecretsProvider
+	var err error
 	if len(providerNames) == 0 {
 		providerNames = []string{"vault"}
 	}
@@ -41,12 +44,14 @@ func (c *SecretsClient) InitProviders(providerNames []string) error {
 			} else {
 				providers = append(providers, provider)
 			}
+		} else {
+			err = errors.Errorf("Invalid Provider %s", providerName)
+			return err
 		}
 	}
 
 	c.Providers = providers
-
-	return nil
+	return err
 }
 
 func (c *SecretsClient) GetParsedEnvs() map[string]string {

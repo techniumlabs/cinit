@@ -38,7 +38,7 @@ func TestNewSecretsClientWithInvalidProvider(t *testing.T) {
 	}
 
 	client := NewSecretsClient(&config)
-	assert.Len(t, client.Providers, 0, "Should have no provider")
+	assert.Nil(t, client, "Invalid Provider")
 }
 
 func TestNewSecretsClientWithBothValidAndInvalid(t *testing.T) {
@@ -47,8 +47,7 @@ func TestNewSecretsClientWithBothValidAndInvalid(t *testing.T) {
 	}
 
 	client := NewSecretsClient(&config)
-	assert.Len(t, client.Providers, 1, "Should have one provider")
-	assert.IsType(t, &vault.VaultSecretProvider{}, client.Providers[0], "Should Create vault provider")
+	assert.Nil(t, client, "Invalid Provider")
 }
 
 type MockSecretProvider struct {
