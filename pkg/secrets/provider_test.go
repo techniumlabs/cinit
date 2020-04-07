@@ -28,8 +28,7 @@ func TestNewSecretsClientWithEmptyConfig(t *testing.T) {
 	}
 
 	client := NewSecretsClient(&config)
-	assert.Len(t, client.Providers, 1, "Should have one provider")
-	assert.IsType(t, &vault.VaultSecretProvider{}, client.Providers[0], "Should Create vault provider")
+	assert.Len(t, client.Providers, 0, "Should have zero provider")
 }
 
 func TestNewSecretsClientWithInvalidProvider(t *testing.T) {

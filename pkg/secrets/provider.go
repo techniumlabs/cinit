@@ -33,9 +33,6 @@ func NewSecretsClient(config *config.Config) *SecretsClient {
 func (c *SecretsClient) InitProviders(providerNames []string) error {
 	var providers []SecretsProvider
 	var err error
-	if len(providerNames) == 0 {
-		providerNames = []string{"vault"}
-	}
 	for _, providerName := range providerNames {
 		if providerName == "vault" {
 			provider, err := vault.NewVaultSecretProvider()
