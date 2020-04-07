@@ -34,6 +34,7 @@ func TestNewVaultProviderWithToken(t *testing.T) {
 func TestNewVaultProviderWithTokenFile(t *testing.T) {
 	token := "some-very-long-token"
 	os.Setenv("VAULT_ADDR", "https://localhost:9090")
+	os.Setenv("VAULT_TOKEN", "")
 
 	home, _ := os.UserHomeDir()
 	ioutil.WriteFile(home+"/.vault-token", []byte(token), 0644)
