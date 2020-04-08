@@ -58,3 +58,16 @@ func TestDefaultTemplateResolveInvalidSrcFile(t *testing.T) {
 	err := tpl.ResolveTemplates(dir.Path()+"/src-template", dir.Path()+"/dest-file", myvarmap)
 	assert.EqualError(t, err, fmt.Sprintf("open %s/src-template: no such file or directory", dir.Path()), "Should throw error")
 }
+
+func TestDefaultTemplateResolveInvalidDestPath(t *testing.T) {
+	tpl := NewDefaultTemplateProvider()
+
+	dir := fs.NewDir(t, "test-template", fs.WithFile("src-template", `{{ .TESTVAR2 }}`))
+	defer dir.Remove()
+	myvarmap := map[string]string{
+		"TESTVAR1": "SOMEVALUE1",
+	}
+	destPath := "/some-wierd-dir-random/dest-file"
+	err := tpl.ResolveTemplates(dir.Path()+"/src-template", destPath, myvarmap)
+	assert.EqualError(t, err, fmt.Sprintf("open %s: no such file or directory", destPath), "Should throw error")
+}
