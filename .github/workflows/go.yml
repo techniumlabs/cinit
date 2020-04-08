@@ -31,11 +31,11 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v .
+      run: make build
 
     - name: Run Unit tests
-      run: |
-        go test -race -covermode atomic -coverprofile=profile.cov ./...
+      run: make cover
+
     - name: Send coverage
       env:
         COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
