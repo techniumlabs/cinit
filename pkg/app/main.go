@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	log "github.com/sirupsen/logrus"
@@ -24,7 +23,7 @@ type FileTemplate struct {
 func NewApp(cfgFile string) (*App, error) {
 	c, err := config.Load(cfgFile)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to parse config %x", err)
+		return nil, err
 	}
 	return &App{Config: c}, nil
 }
@@ -35,6 +34,7 @@ func (a *App) RunInit(args []string) {
 	if len(args) == 0 {
 		log.Fatal("No Main Command Provided")
 	}
+
 	// Get and expose any secrets
 	client := secrets.NewSecretsClient(a.Config)
 	envs := client.GetParsedEnvs()
