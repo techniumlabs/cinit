@@ -23,11 +23,11 @@ Most enterprise companies use vault or some secret store. We need some way to ge
 ## How to run
 ### Dockerfile
 you can use it as an entrypoint and command
-    `ENTRYPOINT ["cinit", "run" "--"]`
+    `ENTRYPOINT ["cinit", "--"]`
     `CMD ["command_to_run"]`
 
 ### Locally
-    `cinit run -- command_to_run`
+    `cinit -- command_to_run`
 
 ## Configuration
 cinit looks for configuration file `.cinit.yaml` in the current directory or home directory in that order.
