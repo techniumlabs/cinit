@@ -9,13 +9,18 @@ import (
 	"github.com/spf13/viper"
 )
 
+type ProviderConfig struct {
+	SecretProviders  []string `mapstructure:"secret"`
+	TemplateProvider string   `mapstructure:"template"`
+}
+
 type Config struct {
-	SecretProviders []string       `mapstructure:"providers"`
+	ProviderConfig ProviderConfig `mapstructure:"providers"`
 	Templates       []TemplateDefs `mapstructure:"templates"`
 }
 
 type TemplateDefs struct {
-	Source string `mapstructure:"source"`
+	Source string `mapstructure:"src"`
 	Dest   string `mapstructure:"dest"`
 }
 

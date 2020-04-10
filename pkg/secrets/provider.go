@@ -21,7 +21,7 @@ type SecretsClient struct {
 
 func NewSecretsClient(config *config.Config) *SecretsClient {
 	client := &SecretsClient{}
-	err := client.InitProviders(config.SecretProviders)
+	err := client.InitProviders(config.ProviderConfig.SecretProviders)
 	if err != nil {
 		log.Printf("Could not Initialize Providers %v", err)
 		return nil

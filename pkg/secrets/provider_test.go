@@ -12,7 +12,9 @@ import (
 
 func TestNewSecretsClient(t *testing.T) {
 	config := config.Config{
-		SecretProviders: []string{"vault"},
+		ProviderConfig: config.ProviderConfig{
+			SecretProviders: []string{"vault"},
+		},
 	}
 
 	os.Setenv("VAULT_ADDR", "https://localhost:9090")
@@ -24,7 +26,9 @@ func TestNewSecretsClient(t *testing.T) {
 
 func TestNewSecretsClientWithEmptyConfig(t *testing.T) {
 	config := config.Config{
-		SecretProviders: []string{},
+		ProviderConfig: config.ProviderConfig{
+			SecretProviders: []string{},
+		},
 	}
 
 	client := NewSecretsClient(&config)
@@ -33,7 +37,9 @@ func TestNewSecretsClientWithEmptyConfig(t *testing.T) {
 
 func TestNewSecretsClientWithInvalidProvider(t *testing.T) {
 	config := config.Config{
-		SecretProviders: []string{"someprovider"},
+		ProviderConfig: config.ProviderConfig{
+			SecretProviders: []string{"someprovider"},
+		},
 	}
 
 	client := NewSecretsClient(&config)
@@ -42,7 +48,9 @@ func TestNewSecretsClientWithInvalidProvider(t *testing.T) {
 
 func TestNewSecretsClientWithBothValidAndInvalid(t *testing.T) {
 	config := config.Config{
-		SecretProviders: []string{"someprovider", "vault"},
+		ProviderConfig: config.ProviderConfig{
+			SecretProviders: []string{"someprovider", "vault"},
+		},
 	}
 
 	client := NewSecretsClient(&config)
@@ -60,7 +68,9 @@ func (m *MockSecretProvider) ResolveSecrets(envMap map[string]string) map[string
 
 func TestEnvParsing(t *testing.T) {
 	config := config.Config{
-		SecretProviders: []string{"vault"},
+		ProviderConfig: config.ProviderConfig{
+			SecretProviders: []string{"vault"},
+		},
 	}
 
 	client := NewSecretsClient(&config)
