@@ -30,7 +30,16 @@ you can use it as an entrypoint and command
     `cinit -- command_to_run`
 
 ## Configuration
-cinit looks for configuration file `.cinit.yaml` in the current directory or home directory in that order.
+cinit looks for configuration file `.cinit.yaml` in the current directory or home directory in that order. Example Sample file looks like this. 
+```
+provider:
+    secret:
+        - vault
+        
+templates:
+    - src: some-template-file-path
+      dest: dest-path
+```
 
 ## Acknowledgement
 The code for init is taken from [go-init](https://github.com/pablo-ruth/go-init).
