@@ -22,9 +22,18 @@ Most enterprise companies use vault or some secret store. We need some way to ge
 
 ## How to run
 ### Dockerfile
-you can use it as an entrypoint and command
-    `ENTRYPOINT ["cinit", "--"]`
-    `CMD ["command_to_run"]`
+you can use it in dockerfile as follows
+
+```
+FROM alpine
+
+USER <user>
+WORKDIR /home/<user>
+
+COPY cinit.yaml /home/<user>/.cinit.yaml
+
+ENTRYPOINT ["cinit", "--"]
+```
 
 ### Locally
     `cinit -- command_to_run`
