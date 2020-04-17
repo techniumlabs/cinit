@@ -16,7 +16,7 @@ type ProviderConfig struct {
 
 type Config struct {
 	ProviderConfig ProviderConfig `mapstructure:"providers"`
-	Templates       []TemplateDefs `mapstructure:"templates"`
+	Templates      []TemplateDefs `mapstructure:"templates"`
 }
 
 type TemplateDefs struct {

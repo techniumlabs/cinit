@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"github.com/techniumlabs/cinit/pkg/config"
 	"github.com/techniumlabs/cinit/pkg/proc"
 	"github.com/techniumlabs/cinit/pkg/secrets"
@@ -23,7 +24,12 @@ type FileTemplate struct {
 func NewApp(cfgFile string) (*App, error) {
 	c, err := config.Load(cfgFile)
 	if err != nil {
-		return nil, err
+		switch err.(type) {
+		case viper.ConfigFileNotFoundError:
+			return &App{Config: nil}, nil
+		default:
+			return nil, err
+		}
 	}
 	return &App{Config: c}, nil
 }
@@ -36,18 +42,23 @@ func (a *App) RunInit(args []string) {
 	}
 
 	// Get and expose any secrets
-	client := secrets.NewSecretsClient(a.Config)
-	envs := client.GetParsedEnvs()
+	var client *secrets.SecretsClient
+	var envs map[string]string
+	if a.Config != nil {
+		client = secrets.NewSecretsClient(a.Config)
+		envs = client.GetParsedEnvs()
 
-	// Replace Template Files
-	tclient, _ := templates.NewTemplateClient("default")
+		// Replace Template Files
+		tclient, _ := templates.NewTemplateClient("default")
 
-	for _, elem := range a.Config.Templates {
-		err = tclient.Provider.ResolveTemplates(elem.Source, elem.Dest, envs)
-		if err != nil {
-			log.Error("Template could not be Resolved")
+		for _, elem := range a.Config.Templates {
+			err = tclient.Provider.ResolveTemplates(elem.Source, elem.Dest, envs)
+			if err != nil {
+				log.Error("Template could not be Resolved")
+			}
 		}
 	}
+
 	// Execute any pre commands and post commands on exit
 
 	// Execute the provided command

@@ -26,3 +26,11 @@ func TestNewAppWithInvalidConfigFile(t *testing.T) {
 	assert.Error(t, err, "Should be err")
 	assert.Regexp(t, regexp.MustCompile("While parsing config: yaml: unmarshal errors"), err.Error(), "Should be same")
 }
+
+func TestNewAppWithNoConfigFile(t *testing.T) {
+	dir := fs.NewDir(t, "test-config-file")
+	defer dir.Remove()
+	app, err := NewApp("")
+	assert.NotNil(t, app, "App should not be nil")
+	assert.NoError(t, err, "Should not be err")
+}
