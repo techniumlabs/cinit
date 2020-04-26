@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/Pallinder/go-randomdata v1.2.0
+	github.com/aws/aws-sdk-go v1.30.14
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/frankban/quicktest v1.5.0 // indirect
 	github.com/hashicorp/go-hclog v0.10.0 // indirect
@@ -20,7 +21,6 @@ require (
 	github.com/spf13/cobra v0.0.7
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.5.1
-	golang.org/x/net v0.0.0-20191112182307-2180aed22343 // indirect
 	golang.org/x/sys v0.0.0-20200327173247-9dae0f8f5775 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
