@@ -1,8 +1,10 @@
 package providers
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 	"text/template"
 
 	log "github.com/sirupsen/logrus"
@@ -17,14 +19,22 @@ func NewDefaultTemplateProvider() *DefaultTemplateProvider {
 
 func (t *DefaultTemplateProvider) ResolveTemplates(source string, dest string, vars map[string]string) error {
 
-	// Create a new template and parse the letter into it.
-	srcContent, err := ioutil.ReadFile(source)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"source": source,
-			"dest": dest,
-		}).Error(err.Error())
-		return err
+	var srcContent []byte
+	var err error
+
+	if strings.HasPrefix(source, "env:") {
+		// Build a template with just the env variable in it
+		srcContent = []byte(fmt.Sprintf("{{ .%s }}", source[4:]))
+	} else {
+		// Create a new template and parse the letter into it.
+		srcContent, err = ioutil.ReadFile(source)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"source": source,
+				"dest":   dest,
+			}).Error(err.Error())
+			return err
+		}
 	}
 	tmpl := template.Must(template.New("src").Parse(string(srcContent)))
 	f, err := os.Create(dest)
