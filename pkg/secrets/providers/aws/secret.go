@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/secretsmanager/secretsmanageriface"
 	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/aws/aws-sdk-go/service/ssm/ssmiface"
-	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 // SecretsProvider AWS secrets provider
@@ -18,7 +18,7 @@ type SecretsProvider struct {
 	ssm     ssmiface.SSMAPI
 }
 
-func NewAwsSecretsProvider() (secrets.Provider, error) {
+func NewAwsSecretsProvider() (*SecretsProvider, error) {
 	var err error
 	sp := SecretsProvider{}
 	// create AWS session
@@ -39,7 +39,7 @@ func (sp *SecretsProvider) ResolveSecrets(vars map[string]string) map[string]str
 	parsedString := make(map[string]string)
 	for key, value := range vars {
 		if strings.HasPrefix(value, "aws:") {
-			if strings.HasPrefix(value, "arn:aws:ssm") && strings.Contains(value, ":parameter/"){
+			if strings.HasPrefix(value, "arn:aws:ssm") && strings.Contains(value, ":parameter/") {
 				tokens := strings.Split(value, ":")
 				// valid parameter ARN arn:aws:ssm:REGION:ACCOUNT:parameter/PATH
 				if len(tokens) == 6 {
@@ -52,7 +52,7 @@ func (sp *SecretsProvider) ResolveSecrets(vars map[string]string) map[string]str
 						WithDecryption: &withDecryption,
 					})
 					if err != nil {
-						log.Printf("Could not resolv %s. Err %s", secretKeyPath, err)
+						log.Printf("Could not resolv %s. Err %s", paramName, err)
 						parsedString[key] = value
 					} else {
 						parsedString[key] = *param.Parameter.Value

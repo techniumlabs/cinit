@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/techniumlabs/cinit/pkg/config"
+	awsprovider "github.com/techniumlabs/cinit/pkg/secrets/providers/aws"
 	"github.com/techniumlabs/cinit/pkg/secrets/providers/vault"
 )
 
@@ -36,6 +37,13 @@ func (c *SecretsClient) InitProviders(providerNames []string) error {
 	for _, providerName := range providerNames {
 		if providerName == "vault" {
 			provider, err := vault.NewVaultSecretProvider()
+			if err != nil {
+				log.Printf("%s", err.Error())
+			} else {
+				providers = append(providers, provider)
+			}
+		} else if providerName == "aws" {
+			provider, err := awsprovider.NewAwsSecretsProvider()
 			if err != nil {
 				log.Printf("%s", err.Error())
 			} else {
