@@ -16,7 +16,7 @@ Most enterprise companies use vault or some secret store. We need some way to ge
 ## Features
 1. Secret store integration.
    - Vault
-   - **TODO** AWS Secret Manager
+   - AWS Secret Manager
 2. Template substitution
    - Most of the time the resulting secrets has to be injected into some config file. We now support go templates.
 
@@ -39,14 +39,21 @@ ENTRYPOINT ["cinit", "--"]
     `cinit -- command_to_run`
 
 ## Configuration
-cinit looks for configuration file `.cinit.yaml` in the current directory or home directory in that order. Example Sample file looks like this. 
+cinit looks for configuration file `.cinit.yaml` in the current directory or home directory in that order. Example Sample file looks like this.
 ```
 provider:
     secret:
         - vault
-        
+
 templates:
     - src: some-template-file-path
+      dest: dest-path
+```
+
+To save the env variable to a file, prefix `env:` to the `src` followed by name of env variable.
+```
+templates:
+    - src: env:MY_ENV_VAR
       dest: dest-path
 ```
 
