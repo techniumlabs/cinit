@@ -21,11 +21,8 @@ require (
 	github.com/spf13/cobra v0.0.7
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
-	golang.org/x/sys v0.0.0-20200327173247-9dae0f8f5775 // indirect
-	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
-	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/square/go-jose.v2 v2.4.0 // indirect
 	gotest.tools v2.2.0+incompatible
 	gotest.tools/v3 v3.0.2
-	k8s.io/client-go v0.17.4
+	k8s.io/client-go v0.19.1
 )
