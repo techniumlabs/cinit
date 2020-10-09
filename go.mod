@@ -26,6 +26,6 @@ require (
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/square/go-jose.v2 v2.4.0 // indirect
 	gotest.tools v2.2.0+incompatible
-	gotest.tools/v3 v3.0.2
+	gotest.tools/v3 v3.0.3
 	k8s.io/client-go v0.17.4
 )
