@@ -17,7 +17,7 @@ require (
 	github.com/pierrec/lz4 v2.3.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/gotest v0.0.0-20200206190159-3023d5d6366c // indirect
-	github.com/sirupsen/logrus v1.7.0
+	github.com/sirupsen/logrus v1.7.1
 	github.com/spf13/cobra v0.0.7
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
