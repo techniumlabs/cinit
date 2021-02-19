@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/Pallinder/go-randomdata v1.2.0
-	github.com/aws/aws-sdk-go v1.35.30
+	github.com/aws/aws-sdk-go v1.37.14
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/frankban/quicktest v1.5.0 // indirect
 	github.com/hashicorp/go-hclog v0.10.0 // indirect
